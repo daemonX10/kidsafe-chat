@@ -2,23 +2,23 @@
 
 A safe AI chatbot for kids and teens under 18. Ask **Nova** about homework, science, stories, or games. Adult, violent, terrorist, drug, and hateful words are blocked with a clear **"This is an 18+ word"** message.
 
-Built with Next.js, React Three Fiber (3D animated background), Tailwind CSS, and the OpenAI API.
+Built with Next.js, React Three Fiber (3D animated background), Tailwind CSS, and Meta Llama models through [FastRouter](https://fastrouter.ai) (an OpenAI-compatible model gateway).
 
 ## Features
 
 - **Four safety checks** on every message:
   1. **Word filter.** Blocks bad words instantly, even tricks like `s3x`, `f.u.c.k`, `fuuuck`, `f*ck`. Works without an API key.
-  2. **AI moderation.** OpenAI's free moderation model catches harmful meaning without bad words (e.g. "how do I hurt someone"). Limits are stricter than the defaults because the users are kids.
+  2. **AI moderation.** Two checks run in parallel: Meta's **Llama Guard 4** safety classifier, plus a kid-strict classifier that also blocks things Llama Guard allows for adults (alcohol, swearing, dirty jokes, bullying). Together they catch harmful meaning without bad words (e.g. "how do I hurt someone").
   3. **Kid-safe instructions.** Nova is told to stay age-appropriate, refuse jailbreak tricks, and never ask for personal information.
   4. **Answer check.** Nova's own reply is checked again before it is shown.
 - **Self-harm support.** Messages about self-harm get a kind reply pointing to a trusted adult and helplines, not a "blocked" message.
 - **3D dark-blue theme.** A glowing orb follows the mouse and changes colour: blue when idle, purple while thinking, red with a shake when a message is blocked.
-- **Privacy and abuse limits.** The API key stays on the server, chats are not stored by OpenAI (`store: false`), each visitor is limited to 20 messages a minute, and messages are capped at 1,000 characters.
+- **Privacy and abuse limits.** The API key stays on the server, each visitor is limited to 20 messages a minute, and messages are capped at 1,000 characters.
 
 ## Requirements
 
 - [Node.js](https://nodejs.org/) **20 or newer** (22 recommended). Check with `node -v`.
-- An [OpenAI API key](https://platform.openai.com/api-keys) with **credits** added at [Billing](https://platform.openai.com/settings/organization/billing/). A ChatGPT Plus subscription does not include API credits.
+- A [FastRouter](https://fastrouter.ai) API key with credits.
 
 ## Setup
 
@@ -35,7 +35,7 @@ cd kidsafe-chat
 npm install
 ```
 
-### 3. Add your OpenAI API key
+### 3. Add your FastRouter API key
 
 Copy the example file to `.env.local`:
 
@@ -50,9 +50,9 @@ Copy-Item .env.example .env.local
 Open `.env.local` and replace the placeholder with your key:
 
 ```env
-OPENAI_API_KEY=sk-proj-your-real-key
-# Optional: use a different chat model (default: gpt-5.4-mini)
-OPENAI_MODEL=
+FASTROUTER_API_KEY=sk-v1-your-real-key
+# Optional: use a different chat model (default: meta-llama/llama-3.1-8b-instruct-turbo)
+FASTROUTER_MODEL=
 ```
 
 > **Never put your real key in `.env.example`** or commit it. `.env.local` is git-ignored; `.env.example` is committed.
@@ -98,7 +98,7 @@ npm start
 |---|---|
 | Add or remove blocked words | [`lib/safety/wordlist.ts`](lib/safety/wordlist.ts) |
 | Blocked-message wording and helplines | [`lib/safety/categories.ts`](lib/safety/categories.ts) |
-| Nova's personality and rules, moderation strictness | [`lib/openai.ts`](lib/openai.ts) |
+| Nova's personality and rules, moderation strictness | [`lib/llm.ts`](lib/llm.ts) |
 | Chat API logic | [`app/api/chat/route.ts`](app/api/chat/route.ts) |
 | Chat UI | [`components/ChatApp.tsx`](components/ChatApp.tsx) |
 | 3D background | [`components/Scene3D.tsx`](components/Scene3D.tsx) |
@@ -109,10 +109,10 @@ Run `npm test` after editing the word list to check nothing innocent gets blocke
 
 | Message in the chat | Fix |
 |---|---|
-| "the OpenAI account has no credits left" | Add credits at [OpenAI Billing](https://platform.openai.com/settings/organization/billing/), wait a minute, try again. |
-| "the OpenAI API key is invalid" | Check `OPENAI_API_KEY` in `.env.local`. |
+| "the FastRouter account is out of credits" | Top up your FastRouter account, wait a minute, try again. |
+| "the FastRouter API key is invalid" | Check `FASTROUTER_API_KEY` in `.env.local` (or in Vercel's environment variables). |
 | "The chatbot isn't set up yet" | `.env.local` is missing or has no key. See step 3. |
-| "the model ... isn't available" | Set `OPENAI_MODEL` in `.env.local` to a model your account can use (e.g. `gpt-4.1-mini`). |
+| "the model ... isn't available" | Set `FASTROUTER_MODEL` to a model listed by FastRouter (e.g. `meta-llama/llama-3.1-8b-instant`). |
 | Browser says "can't reach this page" | Make sure `npm run dev` is still running and you're using the port it prints. |
 
 ## Project structure
@@ -126,11 +126,17 @@ components/
   Scene3D.tsx         3D animated background
 lib/
   safety/             Word filter, word list, blocked-message text
-  openai.ts           OpenAI client, moderation limits, Nova's instructions
+  llm.ts              FastRouter client, moderation checks, Nova's instructions
   rate-limit.ts       Per-visitor message limit
 tests/
   filter.test.ts      Word-filter tests
 ```
+
+## Deploy to Vercel
+
+1. Push this repo to GitHub and import it at [vercel.com/new](https://vercel.com/new). Vercel detects Next.js automatically.
+2. In **Settings → Environment Variables**, add `FASTROUTER_API_KEY` (and optionally `FASTROUTER_MODEL`). `.env.local` is not uploaded, so the key must be set here.
+3. Deploy. Redeploy after changing environment variables.
 
 ## Notes before going public
 
