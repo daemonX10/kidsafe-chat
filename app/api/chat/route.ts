@@ -20,7 +20,7 @@ function llmErrorText(err: unknown): string {
       return "Nova can't answer right now: the FastRouter account is out of credits. A grown-up needs to top it up.";
     }
     if (err.status === 404) {
-      return `Nova can't answer right now: the model "${err.model}" isn't available. Set FASTROUTER_MODEL in your environment variables.`;
+      return `Nova can't answer right now: the model "${err.model}" isn't available on FastRouter.`;
     }
     if (err.status === 429) return "Nova is getting too many questions right now. Please wait a minute and try again.";
   }

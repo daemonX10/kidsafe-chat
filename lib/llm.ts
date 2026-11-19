@@ -2,13 +2,14 @@ import type { SafetyCategory, SafetyVerdict } from "./safety/categories";
 import type { ChatMessage } from "./types";
 
 // FastRouter exposes an OpenAI-compatible chat-completions API for many providers.
-const API_URL = (process.env.FASTROUTER_BASE_URL || "https://go.fastrouter.ai/api/v1") + "/chat/completions";
+const API_URL = "https://go.fastrouter.ai/api/v1/chat/completions";
 const REQUEST_TIMEOUT_MS = 20_000;
 
-export const CHAT_MODEL = process.env.FASTROUTER_MODEL || "meta-llama/llama-3.1-8b-instruct-turbo";
+export const CHAT_MODEL = "meta-llama/llama-3.1-8b-instruct-turbo";
 // Meta's dedicated safety classifier, used as one of the two moderation checks.
-const GUARD_MODEL = process.env.FASTROUTER_GUARD_MODEL || "meta-llama/llama-guard-4-12b";
+const GUARD_MODEL = "meta-llama/llama-guard-4-12b";
 
+// The key is read from the environment so it never ends up in the git repo.
 export function getApiKey(): string | null {
   return process.env.FASTROUTER_API_KEY || null;
 }

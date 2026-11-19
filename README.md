@@ -51,8 +51,6 @@ Open `.env.local` and replace the placeholder with your key:
 
 ```env
 FASTROUTER_API_KEY=sk-v1-your-real-key
-# Optional: use a different chat model (default: meta-llama/llama-3.1-8b-instruct-turbo)
-FASTROUTER_MODEL=
 ```
 
 > **Never put your real key in `.env.example`** or commit it. `.env.local` is git-ignored; `.env.example` is committed.
@@ -98,7 +96,7 @@ npm start
 |---|---|
 | Add or remove blocked words | [`lib/safety/wordlist.ts`](lib/safety/wordlist.ts) |
 | Blocked-message wording and helplines | [`lib/safety/categories.ts`](lib/safety/categories.ts) |
-| Nova's personality and rules, moderation strictness | [`lib/llm.ts`](lib/llm.ts) |
+| Models, Nova's personality and rules, moderation strictness | [`lib/llm.ts`](lib/llm.ts) |
 | Chat API logic | [`app/api/chat/route.ts`](app/api/chat/route.ts) |
 | Chat UI | [`components/ChatApp.tsx`](components/ChatApp.tsx) |
 | 3D background | [`components/Scene3D.tsx`](components/Scene3D.tsx) |
@@ -112,7 +110,7 @@ Run `npm test` after editing the word list to check nothing innocent gets blocke
 | "the FastRouter account is out of credits" | Top up your FastRouter account, wait a minute, try again. |
 | "the FastRouter API key is invalid" | Check `FASTROUTER_API_KEY` in `.env.local` (or in Vercel's environment variables). |
 | "The chatbot isn't set up yet" | `.env.local` is missing or has no key. See step 3. |
-| "the model ... isn't available" | Set `FASTROUTER_MODEL` to a model listed by FastRouter (e.g. `meta-llama/llama-3.1-8b-instant`). |
+| "the model ... isn't available" | Change `CHAT_MODEL` in [`lib/llm.ts`](lib/llm.ts) to a model listed by FastRouter (e.g. `meta-llama/llama-3.1-8b-instant`). |
 | Browser says "can't reach this page" | Make sure `npm run dev` is still running and you're using the port it prints. |
 
 ## Project structure
@@ -135,7 +133,7 @@ tests/
 ## Deploy to Vercel
 
 1. Push this repo to GitHub and import it at [vercel.com/new](https://vercel.com/new). Vercel detects Next.js automatically.
-2. In **Settings → Environment Variables**, add `FASTROUTER_API_KEY` (and optionally `FASTROUTER_MODEL`). `.env.local` is not uploaded, so the key must be set here.
+2. In **Settings → Environment Variables**, add `FASTROUTER_API_KEY`. `.env.local` is not uploaded, so the key must be set here.
 3. Deploy. Redeploy after changing environment variables.
 
 ## Notes before going public
